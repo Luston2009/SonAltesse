@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citations - Commenter et Aimer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 1em 0;
+    }
+    .section {
+      margin: 20px;
+    }
+    .citations-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    .citation {
+      background-color: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .commentaires, .likes {
+      margin-top: 10px;
+    }
+    .contact-section, .admin-section {
+      margin: 20px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .citation-input {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .admin-section input[type="password"] {
+      width: 100%;
+    }
+    .comment-list, .like-list {
+      padding-left: 20px;
+    }
+    #admin-login-section {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #admin-login-section input {
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Citations</h1>
+</header>
+
+<!-- Section de connexion Admin -->
+<div id="admin-login-section">
+  <h2>Connexion Admin</h2>
+  <button onclick="afficherConnexionAdmin()">Se connecter en tant qu'Admin</button>
+</div>
+
+<!-- Formulaire de connexion Admin -->
+<div id="admin-form-section" style="display: none; text-align: center; margin-top: 20px;">
+  <input type="password" id="admin-password" placeholder="Entrez 'Altesse' pour accéder">
+  <button onclick="verifierMotDePasse()">Accéder</button>
+</div>
+
+<!-- Section de contacts -->
+<div class="contact-section section" id="contact-section">
+  <h2>Contactez-nous</h2>
+  <p>Vous pouvez nous joindre par email à <strong>contact@exemple.com</strong></p>
+  <p>Suivez-nous sur nos réseaux sociaux : Facebook, Twitter, Instagram.</p>
+</div>
+
+<!-- Section principale des citations -->
+<div class="section">
+  <h2>Bienvenue sur la page de Son Altesse Salt-Viger🤴</h2>
+  <ul class="citations-list" id="citations-list">
+    <!-- Les citations seront affichées ici -->
+  </ul>
+</div>
+
+<!-- Section Admin (Altesse pour accès) -->
+<div class="admin-section section" id="admin-section" style="display: none;">
+  <h2>Gestion des Citations et Contacts</h2>
+  
+  <!-- Gestion des Citations -->
+  <h3>Ajouter une nouvelle citation:</h3>
+  <input type="text" id="citation-text" class="citation-input" placeholder="Entrez une citation">
+  <button onclick="ajouterCitation()">Ajouter</button>
+  
+  <h3>Modifier/Supprimer une citation</h3>
+  <label for="citation-id">ID de la citation à modifier/supprimer :</label>
+  <input type="number" id="citation-id" placeholder="ID de citation">
+  <button onclick="modifierCitation()">Modifier</button>
+  <button onclick="supprimerCitation()">Supprimer</button>
+  
+  <!-- Gestion des Contacts -->
+  <h3>Modifier les informations de contact :</h3>
+  <label for="contact-email">Email :</label>
+  <input type="text" id="contact-email" value="contact@exemple.com">
+  <label for="contact-social">Réseaux sociaux :</label>
+  <input type="text" id="contact-social" value="Facebook, Twitter, Instagram">
+  <button onclick="modifierContacts()">Mettre à jour les contacts</button>
+</div>
+
+<!-- Script JavaScript -->
+<script>
+  const citations = [
+    { id: 1, texte: "La vie est belle.", commentaires: [], likes: 0 },
+    { id: 2, texte: "L'amour est la réponse.", commentaires: [], likes: 0 }
+  ];
+  let currentContactEmail = "contact@exemple.com";
+  let currentContactSocial = "Facebook, Twitter, Instagram";
+
+  function afficherCitations() {
+    const listElement = document.getElementById('citations-list');
+    listElement.innerHTML = '';
+    citations.forEach(citation => {
+      const li = document.createElement('li');
+      li.classList.add('citation');
+      li.innerHTML = `
+        <p><strong>"${citation.texte}"</strong></p>
+        <div class="commentaires">
+          <h4>Commentaires :</h4>
+          <ul class="comment-list" id="comments-${citation.id}">
+            ${citation.commentaires.map(commentaire => `<li>${commentaire}</li>`).join('')}
+          </ul>
+          <input type="text" id="comment-${citation.id}" placeholder="Ajouter un commentaire">
+          <button onclick="ajouterCommentaire(${citation.id})">Commenter</button>
+        </div>
+        <div class="likes">
+          <button onclick="ajouterLike(${citation.id})">J'aime (${citation.likes})</button>
+        </div>
+      `;
+      listElement.appendChild(li);
+    });
+  }
+
+  function ajouterCommentaire(citationId) {
+    const commentaire = document.getElementById(`comment-${citationId}`).value;
+    if (commentaire) {
+      const citation = citations.find(cit => cit.id === citationId);
+      citation.commentaires.push(commentaire);
+      document.getElementById(`comment-${citationId}`).value = '';
+      afficherCitations();
+    }
+  }
+
+  function ajouterLike(citationId) {
+    const citation = citations.find(cit => cit.id === citationId);
+    citation.likes += 1;
+    afficherCitations();
+  }
+
+  function ajouterCitation() {
+    const citationTexte = document.getElementById('citation-text').value;
+    if (citationTexte) {
+      const newCitation = {
+        id: citations.length + 1,
+        texte: citationTexte,
+        commentaires: [],
+        likes: 0
+      };
+      citations.push(newCitation);
+      document.getElementById('citation-text').value = '';
+      afficherCitations();
+    }
+  }
+
+  function modifierCitation() {
+    const citationId = parseInt(document.getElementById('citation-id').value);
+    const newCitationTexte = prompt("Entrez le nouveau texte de la citation");
+    const citation = citations.find(cit => cit.id === citationId);
+    if (citation && newCitationTexte) {
+      citation.texte = newCitationTexte;
+      afficherCitations();
+    }
+  }
+
+  function supprimerCitation() {
+    const citationId = parseInt(document.getElementById('citation-id').value);
+    const citationIndex = citations.findIndex(cit => cit.id === citationId);
+    if (citationIndex !== -1) {
+      citations.splice(citationIndex, 1);
+      afficherCitations();
+    }
+  }
+
+  function modifierContacts() {
+    currentContactEmail = document.getElementById('contact-email').value;
+    currentContactSocial = document.getElementById('contact-social').value;
+    document.querySelector('.contact-section').innerHTML = `
+      <h2>Contactez-nous</h2>
+      <p>Vous pouvez nous joindre par email à <strong>${currentContactEmail}</strong></p>
+      <p>Suivez-nous sur nos réseaux sociaux : ${currentContactSocial}</p>
+    `;
+  }
+
+  function verifierMotDePasse() {
+    const password = document.getElementById('admin-password').value;
+    if (password === 'Altesse') {
+      document.getElementById('admin-login-section').style.display = 'none'; // Masque le bouton de connexion
+      document.getElementById('admin-form-section').style.display = 'none'; // Masque le formulaire de connexion
+      document.getElementById('admin-section').style.display = 'block'; // Affiche la section Admin
+    } else {
+      alert('Mot de passe incorrect.');
+    }
+  }
+
+  function afficherConnexionAdmin() {
+    document.getElementById('admin-form-section').style.display = 'block'; // Affiche le formulaire de connexion
+  }
+
+  afficherCitations();
+</script>
+
+</body>
+</html>
